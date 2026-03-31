@@ -31,7 +31,7 @@ Examples:
     # Test M365 direct-to-EOP endpoint
     python3 direct_send_test.py -d target.com --eop --probe-only
 
-Author: Jumpsec
+Author: Mr-Whiskers
 """
 
 import argparse
