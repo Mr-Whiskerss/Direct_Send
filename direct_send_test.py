@@ -1,5 +1,38 @@
 #!/usr/bin/env python3
 """
+direct_send_test.py — Direct Send / Direct-to-MX Attack Tester
+Jumpsec Offensive Security Tooling
+
+Tests whether a target mail server accepts unauthenticated SMTP connections
+directly, bypassing SEG/gateway filtering layers (e.g. Mimecast, Proofpoint).
+
+Usage:
+    python3 direct_send_test.py -d target.com -f attacker@domain.com -t victim@target.com [options]
+
+Modes:
+    --probe-only    Enumerate MX records and test SMTP banner/EHLO only (no mail sent)
+    --dry-run       Full SMTP handshake through to DATA, but abort before final '.'
+    --send          Full delivery (requires --confirm)
+
+Examples:
+    # Passive probe — just check what MX records exist and whether SMTP responds
+    python3 direct_send_test.py -d target.com --probe-only
+
+    # Dry run — walk SMTP session without actually sending
+    python3 direct_send_test.py -d target.com -f test@attacker.com -t user@target.com --dry-run
+
+    # Full send with custom subject/body
+    python3 direct_send_test.py -d target.com -f it-helpdesk@target.com -t user@target.com \\
+        --subject "Action Required: Password Expiry" --body-file lure.html --send --confirm
+
+    # Test specific IP/host (e.g. known backend MX bypassing SEG)
+    python3 direct_send_test.py -d target.com -H mail-backend.target.com -p 25 --probe-only
+
+    # Test M365 direct-to-EOP endpoint
+    python3 direct_send_test.py -d target.com --eop --probe-only
+
+Author: Jumpsec
+"""
 
 import argparse
 import dns.resolver
@@ -89,8 +122,7 @@ def resolve_mx(domain: str) -> list[MXRecord]:
 
 
 def get_eop_endpoint(domain: str) -> Optional[str]:
-    """
-    Attempt to derive the direct Exchange Online Protection (EOP) endpoint.
+    """Attempt to derive the direct Exchange Online Protection (EOP) endpoint.
     Format: <tenant>.mail.protection.outlook.com
     Derived from TXT/MX records where possible.
     """
