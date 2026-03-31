@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 direct_send_test.py — Direct Send / Direct-to-MX Attack Tester
-Jumpsec Offensive Security Tooling
+
 
 Tests whether a target mail server accepts unauthenticated SMTP connections
 directly, bypassing SEG/gateway filtering layers (e.g. Mimecast, Proofpoint).
